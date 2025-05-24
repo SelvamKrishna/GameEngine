@@ -126,10 +126,10 @@ public:
     return (*this - other).Length();
   }
 
-  static constexpr Vec2 Zero() noexcept { return {0.f, 0.f}; }
-  static constexpr Vec2 One() noexcept { return {1.f, 1.f}; }
-  static constexpr Vec2 Up() noexcept { return {0.f, 1.f}; }
-  static constexpr Vec2 Down() noexcept { return {0.f, -1.f}; }
-  static constexpr Vec2 Left() noexcept { return {-1.f, 0.f}; }
-  static constexpr Vec2 Right() noexcept { return {1.f, 0.f}; }
+  inline static constexpr Vec2 Zero() noexcept { return {0.f, 0.f}; }
+  inline static constexpr Vec2 One() noexcept { return {1.f, 1.f}; }
+  inline static constexpr Vec2 Up() noexcept { return {0.f, 1.f}; }
+  inline static constexpr Vec2 Down() noexcept { return {0.f, -1.f}; }
+  inline static constexpr Vec2 Left() noexcept { return {-1.f, 0.f}; }
+  inline static constexpr Vec2 Right() noexcept { return {1.f, 0.f}; }
 };
