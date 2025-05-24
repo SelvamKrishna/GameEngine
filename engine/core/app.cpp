@@ -1,8 +1,8 @@
 #include "app.hpp"
 #include "../../vendor/raylib.h"
 
-void App::Init() {
-  InitWindow(_width, _height, _title.c_str());
+void App::Init(int width, int height, const char *title) {
+  InitWindow(width, height, title);
   SetExitKey(0);
   _isRunning = true;
 }
@@ -17,19 +17,10 @@ void App::Render() {
   EndDrawing();
 }
 
-void App::Close() {
-  CloseWindow();
-}
-
-void App::Run() {
-  Init();
-  while (_isRunning) {
-    Update();
-    Render();
-  }
-  Close();
-}
-
 void App::Quit() {
   _isRunning = false;
+}
+
+App::~App() {
+  CloseWindow();
 }

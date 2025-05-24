@@ -1,0 +1,22 @@
+build/
+
+*.o
+*.obj
+
+*.exe
+*.out
+*.a
+*.so
+*.dll
+*.dylib
+
+*.log
+*.tmp
+*.swp
+*.bak
+
+.DS_Store       # macOS
+Thumbs.db       # Windows
+
+sandbox/*.exe
+sandbox/*.out

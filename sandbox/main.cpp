@@ -2,9 +2,10 @@
 
 int main() {
   auto &app = App::Instance();
-  app.SetWidth(800);
-  app.SetHeight(800);
-  app.SetTitle("Sandbox Application");
-  app.Run();
-  return 0;
+  app.Init(800, 800, "Sandox Test #1");
+
+  while (app.IsRunning()) {
+    app.Update();
+    app.Render();
+  }
 }
