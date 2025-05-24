@@ -11,7 +11,11 @@ public:
 public:
   constexpr Vec2(float x = 0.f, float y = 0.f) noexcept : x(x), y(y) {}
 
+  // Constructor from a raylib::Vector2
   constexpr operator Vector2() const noexcept { return {x, y}; }
+
+  // Copy to raylib::Vector2 from Vec2
+  constexpr Vec2(const Vector2 &vec) noexcept : x(vec.x), y(vec.y) {}
 
   constexpr Vec2 operator+(const Vec2 &other) const noexcept {
     return {x + other.x, y + other.y};

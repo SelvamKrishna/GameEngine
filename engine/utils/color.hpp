@@ -1,8 +1,8 @@
 #pragma once
 
+#include "../../vendor/raylib.h"
 #include <cstdint>
 #include <cstdlib>
-#include "../../vendor/raylib.h"
 
 struct ColorRGBA {
 public:
