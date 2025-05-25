@@ -1,14 +1,12 @@
 #include "app.hpp"
 #include "../../vendor/raylib.h"
+#include "../systems/time.hpp"
 #include "scene_tree.hpp"
 
 void App::Update() {
-  if (WindowShouldClose())
-    Quit();
+  if (WindowShouldClose()) [[unlikely]] Quit();
 
-  static constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-
-  _accumulator += GetFrameTime();
+  constexpr float kFixedDeltaTime = 1.0f / 60.0f;
 
   while (_accumulator >= kFixedDeltaTime) {
     _currentScene.FixedUpdate();
@@ -25,11 +23,11 @@ void App::Render() {
 }
 
 App::~App() {
-  _currentScene = std::move(SceneTree());
+  _currentScene = SceneTree();
   CloseWindow();
 }
 
-void App::Init(int width, int height, const char *title) {
+void App::Init(const int width, const int height, const char *const title) {
   InitWindow(width, height, title);
   SetExitKey(KEY_NULL);
   _isRunning = true;
@@ -37,7 +35,20 @@ void App::Init(int width, int height, const char *title) {
 }
 
 void App::Run() {
+  TimeSystem &time = TimeSystem::Instance();
+
   while (_isRunning) {
+    const float kDeltaTime = GetFrameTime();
+    time._deltaTime = kDeltaTime;
+
+    if (time.IsPaused()) [[unlikely]] {
+      continue;
+    }
+
+    time._totalTime += kDeltaTime;
+    time._frameCount++;
+    _accumulator += kDeltaTime;
+
     Update();
     Render();
   }

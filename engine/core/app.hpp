@@ -10,6 +10,7 @@ private:
 
 private:
   App() = default;
+  ~App();
 
   App(const App &) = delete;
   App &operator=(const App &) = delete;
@@ -18,10 +19,8 @@ private:
 
   void Update();
   void Render();
-
+  
 public:
-  ~App();
-
   [[nodiscard]]
   static inline App &Instance() noexcept {
     static App instance;

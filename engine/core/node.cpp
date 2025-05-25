@@ -4,7 +4,7 @@
 Node::Node(const std::string &name) : _parent(nullptr), _name(name) {}
 
 void Node::AddChild(std::unique_ptr<Node> child) {
-  for (const auto &currentChild : _children)
+  for (const auto &currentChild : _children) 
     if (currentChild->_name == child->_name)
       throw std::invalid_argument("Child with name '" + child->_name + "' already exists");
 
@@ -26,15 +26,17 @@ void Node::RemoveChild(Node *child) noexcept {
 }
 
 Node &Node::GetChildByIndex(size_t index) {
-  if (index >= _children.size()) throw std::out_of_range("Child index out of range");
+  if (index >= _children.size()) 
+    throw std::out_of_range("Child index out of range");
+
   return *_children[index];
 }
 
 Node &Node::GetChildByName(std::string_view name) {
-  for (const auto &child : _children)
+  for (const auto &child : _children) 
     if (child->_name == name) return *child;
 
-    throw std::invalid_argument("No child named '" + std::string{name} + "' exists");
+  throw std::invalid_argument("No child named '" + std::string(name) + "' exists");
 }
 
 void Node::AddComponent(std::unique_ptr<Component> component) {
@@ -55,7 +57,7 @@ void Node::RemoveComponent(Component *component) noexcept {
 }
 
 Component &Node::GetComponentByIndex(size_t index) {
-  if (index >= _components.size())
+  if (index >= _components.size()) 
     throw std::out_of_range("Component index out of range");
 
   return *_components[index];
@@ -76,8 +78,7 @@ void Node::FixedUpdateTree() {
 void Node::Free() noexcept {
   _parent = nullptr;
 
-  for (auto &child : _children)
-    child->Free();
+  for (auto &child : _children) child->Free();
 
   _children.clear();
   _components.clear();

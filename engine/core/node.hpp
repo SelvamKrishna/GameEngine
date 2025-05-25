@@ -10,13 +10,14 @@
 class SceneTree;
 
 class Node {
+private:
+  friend SceneTree;
+
 protected:
-  Node *_parent;
+  Node *_parent = nullptr;
   std::string _name;
   std::vector<std::unique_ptr<Node>> _children;
   std::vector<std::unique_ptr<Component>> _components;
-
-  friend SceneTree;
 
 private:
   virtual void Init() {}
@@ -27,7 +28,7 @@ private:
   void FixedUpdateTree();
 
 public:
-  Node(const std::string &name);
+  explicit Node(const std::string &name);
   virtual ~Node() = default;
 
   Node(const Node &) = delete;
@@ -40,7 +41,7 @@ public:
   void RemoveChild(Node *child) noexcept;
 
   [[nodiscard]] Node &GetChildByIndex(size_t index);
-  [[nodiscard]] Node &GetChildByName(const std::string_view name);
+  [[nodiscard]] Node &GetChildByName(std::string_view name);
 
   [[nodiscard]] inline size_t GetChildCount() const noexcept {
     return _children.size();
@@ -53,16 +54,16 @@ public:
   template <typename ComponentT>
   [[nodiscard]] ComponentT &GetComponent() const {
     for (const auto &component : _components)
-      if (auto casted = dynamic_cast<ComponentT *>(component.get()))
-        return *casted;
+      if (auto casted = dynamic_cast<ComponentT *>(component.get())) return *casted; 
+
     throw std::invalid_argument("Component not available");
   }
 
   template <typename ComponentT>
   [[nodiscard]] bool HasComponent() const noexcept {
     for (const auto &component : _components)
-      if (dynamic_cast<ComponentT *>(component.get()))
-        return true;
+      if (dynamic_cast<ComponentT *>(component.get())) return true;
+
     return false;
   }
 
@@ -70,26 +71,20 @@ public:
   [[nodiscard]] std::vector<ComponentT *> GetComponentsByType() const noexcept {
     std::vector<ComponentT *> matches;
     for (const auto &component : _components)
-      if (auto casted = dynamic_cast<ComponentT *>(component.get()))
-        matches.push_back(casted);
+      if (auto casted = dynamic_cast<ComponentT *>(component.get())) matches.push_back(casted);
+
     return matches;
   }
 
-  [[nodiscard]] 
-  inline const Node *GetParent() const noexcept { return _parent; }
+  [[nodiscard]] inline const Node *GetParent() const noexcept { return _parent; }
 
-  [[nodiscard]] 
-  inline const std::string &GetName() const noexcept { return _name; }
-  
-  [[nodiscard]]
-  inline const std::vector<std::unique_ptr<Node>> &GetChildren() const noexcept {
-    return _children;
-  }
+  [[nodiscard]] inline const std::string &GetName() const noexcept { return _name; }
 
-  [[nodiscard]] 
-  inline const std::vector<std::unique_ptr<Component>> &GetComponents() const noexcept {
-    return _components;
-  }
+  [[nodiscard]] inline const std::vector<std::unique_ptr<Node>> &
+  GetChildren() const noexcept { return _children; }
+
+  [[nodiscard]] inline const std::vector<std::unique_ptr<Component>> &
+  GetComponents() const noexcept { return _components; }
 
   void Free() noexcept;
 };
