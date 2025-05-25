@@ -1,9 +1,21 @@
 #include "app.hpp"
 #include "../../vendor/raylib.h"
+#include <memory>
 
 void App::Update() {
   if (WindowShouldClose()) Quit();
-  _currentScene.Update(GetFrameTime());
+
+  static constexpr float kFixedDeltaTime = 1.0f / 60.0f;
+  const float kDeltaTime = GetFrameTime();
+
+  _accumulator += kDeltaTime;
+
+  while (_accumulator >= kFixedDeltaTime) {
+    _currentScene.FixedUpdate();
+    _accumulator -= kFixedDeltaTime;
+  }
+
+  _currentScene.Update(kDeltaTime);
 }
 
 void App::Render() {
@@ -14,12 +26,14 @@ void App::Render() {
 
 App::~App() {
   CloseWindow();
-  _currentScene.SetRoot(nullptr);
+  _currentScene.SetRoot(std::unique_ptr<Node>{});
 }
 
 void App::Init(int width, int height, const char *title) {
   InitWindow(width, height, title);
+  SetExitKey(KEY_NULL);
   _isRunning = true;
+  _accumulator = 0.0f;
 }
 
 void App::Run() {

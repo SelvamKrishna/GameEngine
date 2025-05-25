@@ -4,8 +4,10 @@
 
 class App {
 private:
-  bool _isRunning;
+  bool _isRunning = false;
   SceneTree _currentScene;
+
+  float _accumulator;
 
 private:
   App() = default;
@@ -30,7 +32,8 @@ public:
   void Quit();
 
   inline const bool IsRunning() { return _isRunning; }
-  inline void SetCurrentScene(SceneTree &currentScene) {
-    _currentScene = std::move(currentScene);
-  };
+
+  inline void SetCurrentScene(SceneTree currentScene) { _currentScene = std::move(currentScene); };
+
+  inline const SceneTree &GetCurrentScene() { return _currentScene; }
 };

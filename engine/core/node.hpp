@@ -1,50 +1,37 @@
 #pragma once
 
-#include <algorithm>
+#include <cstddef>
+#include <memory>
 #include <string>
 #include <vector>
 
 class Node {
 protected:
   Node *_parent = nullptr;
-  std::vector<Node *> _children;
+  std::vector<std::unique_ptr<Node>> _children;
   std::string _name;
 
 public:
-  Node(const std::string &name = "Node") : _name(name) {}
+  Node(const std::string &name);
+  virtual ~Node() = default;
 
-  virtual ~Node() {
-    for (Node *child : _children) delete child;
-  }
+  static std::unique_ptr<Node> Create(const std::string &name);
 
-  void AddChild(Node *child) {
-    child->_parent = this;
-    _children.push_back(child);
-    child->Start();
-  }
+  void ResizeChildrenList(size_t newSize);
 
-  void RemoveChild(Node *child) {
-    _children.erase(
-      std::remove(_children.begin(), _children.end(), child),
-      _children.end()
-    );
+  void AddChild(std::unique_ptr<Node> child);
+  void RemoveChild(Node *child);
 
-    delete child;
-  }
+  Node &GetChild(Node *child);
+  Node &GetChild(size_t index);
 
-  virtual void Start() {}
-  virtual void Update(const float delta) {}
-  virtual void FixedUpdate(const float delta) {}
+  virtual void Init() {}
+  virtual void Update(const float deltaTime) {}
+  virtual void FixedUpdate() {}
 
-  void UpdateTree(const float delta) {
-    Update(delta);
-    for (auto child : _children) child->UpdateTree(delta);
-  }
+  void UpdateTree(const float deltaTime);
+  void FixedUpdateTree();
 
-  void FixedUpdateTree(const float delta) {
-    FixedUpdate(delta);
-    for (auto child : _children) child->FixedUpdateTree(delta);
-  }
-
-  const std::string &GetName() const { return _name; }
+  inline const std::string &GetName() const { return _name; }
+  void Free();
 };

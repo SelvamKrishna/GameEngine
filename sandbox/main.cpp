@@ -6,7 +6,7 @@ class Sample : public Node {
 public:
   Sample(const std::string &name) : Node(name) {}
 
-  void Start() override {
+  void Init() override {
     std::cout << "created: " << _name << "\n";
   }
 
@@ -14,17 +14,18 @@ public:
     std::cout << "updating: " << _name << "\n";
   }
 
-  void FixedUpdate(const float deltaTime) override {
+  void FixedUpdate() override {
+    std::cout << "fixed updating: " << _name << "\n";
   }
 };
 
 int main() {
   SceneTree tree;
 
-  Sample *node = new Sample("sample root");
-  node->AddChild(new Sample("sample child 1"));
+  auto node = Node::Create("Sample root");
+  node->AddChild(Node::Create("Sample child"));
 
-  tree.SetRoot(node);
+  tree.SetRoot(node.get());
 
   App &app = App::Instance();
   app.Init(800, 800, "Sandbox #1");

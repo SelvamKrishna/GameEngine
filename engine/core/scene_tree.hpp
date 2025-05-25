@@ -1,21 +1,16 @@
 #pragma once
 
 #include "node.hpp"
+#include <memory>
 
 class SceneTree {
 private:
-  Node *_root = nullptr;
+  std::unique_ptr<Node> _root;
 
 public:
   SceneTree() = default;
-  ~SceneTree() { if (_root) delete _root; }
 
-  void SetRoot(Node *root) {
-    if (_root) delete _root;
-    _root = root;
-    _root->Start();
-  }
-
-  void Update(const float deltaTime) { if (_root) _root->UpdateTree(deltaTime); }
-  void FixedUpdate(const float deltaTime) { if (_root) _root->FixedUpdateTree(deltaTime); }
+  void SetRoot(std::unique_ptr<Node> root);
+  void Update(const float deltaTime);
+  void FixedUpdate();
 };
