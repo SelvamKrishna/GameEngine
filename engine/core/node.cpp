@@ -1,28 +1,22 @@
 #include "node.hpp"
 #include <algorithm>
-#include <stdexcept>
 
-Node::Node(const std::string &name) : _name(name) {}
-
-std::unique_ptr<Node> Node::Create(const std::string &name) {
-  return std::make_unique<Node>(name);
-}
-
-void Node::ResizeChildrenList(size_t newSize) {
-  if (newSize > _children.size()) _children.resize(newSize);
-}
+Node::Node(const std::string &name) : _parent(nullptr), _name(name) {}
 
 void Node::AddChild(std::unique_ptr<Node> child) {
+  for (const auto &currentChild : _children)
+    if (currentChild->_name == child->_name)
+      throw std::invalid_argument("Child with name '" + child->_name + "' already exists");
+
   child->_parent = this;
   child->Init();
   _children.emplace_back(std::move(child));
 }
 
-void Node::RemoveChild(Node *child) {
-  auto it = std::find_if(_children.begin(), _children.end(), 
-    [child](const std::unique_ptr<Node> &ptr) {
-      return ptr.get() == child;
-    }
+void Node::RemoveChild(Node *child) noexcept {
+  auto it = std::find_if(
+    _children.begin(), _children.end(),
+    [child](const std::unique_ptr<Node> &ptr) { return ptr.get() == child; }
   );
 
   if (it != _children.end()) {
@@ -31,38 +25,60 @@ void Node::RemoveChild(Node *child) {
   }
 }
 
-Node &Node::GetChild(Node *child) {
-  auto it = std::find_if(_children.begin(), _children.end(), 
-    [child](const std::unique_ptr<Node> &ptr) {
-      return ptr.get() == child;
-    }
-  );
-
-  if (it == _children.end())
-    throw std::runtime_error("Child node not found");
-
-  return *it->get();
-}
-
-Node &Node::GetChild(size_t index) {
-  if (index >= _children.size())
-    throw std::out_of_range("Child index out of range");
-
+Node &Node::GetChildByIndex(size_t index) {
+  if (index >= _children.size()) throw std::out_of_range("Child index out of range");
   return *_children[index];
 }
 
-void Node::UpdateTree(const float deltaTime) {
-  Update(deltaTime);
-  for (auto &child : _children) child->UpdateTree(deltaTime);
+Node &Node::GetChildByName(std::string_view name) {
+  for (const auto &child : _children)
+    if (child->_name == name) return *child;
+
+    throw std::invalid_argument("No child named '" + std::string{name} + "' exists");
+}
+
+void Node::AddComponent(std::unique_ptr<Component> component) {
+  component->_owner = this;
+  _components.emplace_back(std::move(component));
+}
+
+void Node::RemoveComponent(Component *component) noexcept {
+  auto it = std::find_if(
+    _components.begin(), _components.end(),
+    [component](const std::unique_ptr<Component> &ptr) { return ptr.get() == component; }
+  );
+
+  if (it != _components.end()) {
+    (*it)->_owner = nullptr;
+    _components.erase(it);
+  }
+}
+
+Component &Node::GetComponentByIndex(size_t index) {
+  if (index >= _components.size())
+    throw std::out_of_range("Component index out of range");
+
+  return *_components[index];
+}
+
+void Node::UpdateTree() {
+  Update();
+  for (auto &component : _components) component->Update();
+  for (auto &child : _children) child->UpdateTree();
 }
 
 void Node::FixedUpdateTree() {
   FixedUpdate();
+  for (auto &component : _components) component->FixedUpdate();
   for (auto &child : _children) child->FixedUpdateTree();
 }
 
-void Node::Free() {
+void Node::Free() noexcept {
   _parent = nullptr;
-  for (auto &child : _children) child->Free();
+
+  for (auto &child : _children)
+    child->Free();
+
   _children.clear();
+  _components.clear();
 }

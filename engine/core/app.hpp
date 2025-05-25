@@ -6,11 +6,11 @@ class App {
 private:
   bool _isRunning = false;
   SceneTree _currentScene;
-
-  float _accumulator;
+  float _accumulator = 0.0f;
 
 private:
   App() = default;
+
   App(const App &) = delete;
   App &operator=(const App &) = delete;
   App(App &&) = delete;
@@ -22,18 +22,28 @@ private:
 public:
   ~App();
 
-  static App &Instance() {
+  [[nodiscard]]
+  static inline App &Instance() noexcept {
     static App instance;
     return instance;
   }
 
   void Init(int width, int height, const char *title);
   void Run();
-  void Quit();
+  void Quit() noexcept;
 
-  inline const bool IsRunning() { return _isRunning; }
+  [[nodiscard]]
+  inline bool IsRunning() const noexcept {
+    return _isRunning;
+  }
 
-  inline void SetCurrentScene(SceneTree currentScene) { _currentScene = std::move(currentScene); };
+  void SetCurrentScene(const SceneTree &) = delete;
+  inline void SetCurrentScene(SceneTree &&currentScene) noexcept {
+    _currentScene = std::move(currentScene);
+  }
 
-  inline const SceneTree &GetCurrentScene() { return _currentScene; }
+  [[nodiscard]]
+  inline const SceneTree &GetCurrentScene() const noexcept {
+    return _currentScene;
+  }
 };

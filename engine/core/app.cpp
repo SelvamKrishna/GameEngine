@@ -1,21 +1,21 @@
 #include "app.hpp"
 #include "../../vendor/raylib.h"
-#include <memory>
+#include "scene_tree.hpp"
 
 void App::Update() {
-  if (WindowShouldClose()) Quit();
+  if (WindowShouldClose())
+    Quit();
 
   static constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-  const float kDeltaTime = GetFrameTime();
 
-  _accumulator += kDeltaTime;
+  _accumulator += GetFrameTime();
 
   while (_accumulator >= kFixedDeltaTime) {
     _currentScene.FixedUpdate();
     _accumulator -= kFixedDeltaTime;
   }
 
-  _currentScene.Update(kDeltaTime);
+  _currentScene.Update();
 }
 
 void App::Render() {
@@ -25,8 +25,8 @@ void App::Render() {
 }
 
 App::~App() {
+  _currentScene = std::move(SceneTree());
   CloseWindow();
-  _currentScene.SetRoot(std::unique_ptr<Node>{});
 }
 
 void App::Init(int width, int height, const char *title) {
@@ -43,4 +43,4 @@ void App::Run() {
   }
 }
 
-void App::Quit() { _isRunning = false; }
+void App::Quit() noexcept { _isRunning = false; }

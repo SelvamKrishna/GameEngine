@@ -1,7 +1,6 @@
 #pragma once
 
 #include "node.hpp"
-#include <memory>
 
 class SceneTree {
 private:
@@ -10,7 +9,16 @@ private:
 public:
   SceneTree() = default;
 
-  void SetRoot(std::unique_ptr<Node> root);
-  void Update(const float deltaTime);
+  SceneTree(SceneTree &&other) noexcept = default;
+  SceneTree &operator=(SceneTree &&other) noexcept = default;
+
+  SceneTree(const SceneTree &) = delete;
+  SceneTree &operator=(const SceneTree &) = delete;
+
+  void SetRoot(std::unique_ptr<Node> root) noexcept;
+
+  [[nodiscard]] bool HasRoot() const noexcept { return static_cast<bool>(_root); }
+
+  void Update();
   void FixedUpdate();
 };
