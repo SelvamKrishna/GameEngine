@@ -1,18 +1,25 @@
 #include "node.hpp"
 #include "component.hpp"
 #include <algorithm>
+
+#ifdef PR_DEBUG
 #include <format>
+#endif
 
 Node::Node(const std::string &name) : _parent(nullptr), _name(name) {}
 
 void Node::AddChild(std::unique_ptr<Node> child) {
-  for (const auto &currentChild : _children) {
-    if (currentChild->_name == child->_name) [[unlikely]] {
-      throw NodeError(
-        std::format( "Child with name '{}' already exists.", child->_name)
-      );
+#ifdef PR_DEBUG
+  const auto duplicate = std::ranges::any_of(
+    _children, 
+    [&](const std::unique_ptr<Node> &existing) {
+      return existing->_name == child->_name;
     }
-  }
+  );
+
+  if (duplicate) [[unlikely]]
+    throw NodeError(std::format("Child with name '{}' already exists.", child->_name));
+#endif
 
   child->_parent = this;
   child->Init();
@@ -22,9 +29,7 @@ void Node::AddChild(std::unique_ptr<Node> child) {
 void Node::RemoveChild(Node *child) noexcept {
   auto it = std::ranges::find_if(
     _children,
-    [child](const std::unique_ptr<Node> &ptr) {
-      return ptr.get() == child; 
-    }
+    [child](const std::unique_ptr<Node> &ptr) { return ptr.get() == child; }
   );
 
   if (it != _children.end()) [[likely]] {
@@ -34,9 +39,10 @@ void Node::RemoveChild(Node *child) noexcept {
 }
 
 Node &Node::GetChildByIndex(size_t index) {
-  if (index >= _children.size()) [[unlikely]]
+#ifdef PR_DEBUG
+  if (index >= _children.size()) [[unlikely]] 
     throw std::out_of_range("Child index out of range");
-
+#endif
   return *_children[index];
 }
 
@@ -45,7 +51,11 @@ Node &Node::GetChildByName(std::string_view name) {
     if (child->_name == name) return *child;
   }
 
-  throw NodeError( std::format("Child with name '{}' not found.", name));
+#ifdef PR_DEBUG
+  throw NodeError(std::format("Child with name '{}' not found.", name));
+#endif
+
+  return *_children.front();
 }
 
 void Node::AddComponent(std::unique_ptr<Component> component) {
@@ -55,9 +65,9 @@ void Node::AddComponent(std::unique_ptr<Component> component) {
 
 void Node::RemoveComponent(Component *component) noexcept {
   auto it = std::ranges::find_if(
-    _components,
-    [component](const std::unique_ptr<Component> &ptr) { 
-      return ptr.get() == component; 
+    _components, 
+    [component](const std::unique_ptr<Component> &ptr) {
+      return ptr.get() == component;
     }
   );
 
@@ -68,43 +78,50 @@ void Node::RemoveComponent(Component *component) noexcept {
 }
 
 Component &Node::GetComponentByIndex(size_t index) {
+#ifdef PR_DEBUG
   if (index >= _components.size()) [[unlikely]]
     throw std::out_of_range("Component index out of range");
+#endif
 
   return *_components[index];
 }
 
 void Node::UpdateTree() {
   Update();
-  
-  for (auto &component : _components) {
-    if (component == nullptr) [[unlikely]] 
-      throw NodeError("Null component in UpdateTree");
 
+  for (auto &component : _components) {
+#ifdef PR_DEBUG
+    if (!component) [[unlikely]]
+      throw NodeError("Null component found during UpdateTree");
+#endif
     component->Update();
   }
 
   for (auto &child : _children) {
-    if (child == nullptr) [[unlikely]]
-      throw NodeError("Null child in UpdateTree"); 
-
+#ifdef PR_DEBUG
+    if (!child) [[unlikely]]
+      throw NodeError("Null child found during UpdateTree");
+#endif
     child->UpdateTree();
   }
 }
 
 void Node::FixedUpdateTree() {
   FixedUpdate();
-  for (auto &component : _components) {
-    if (component == nullptr) [[unlikely]]
-      throw NodeError("Null component null in FixedUpdateTree");
 
+  for (auto &component : _components) {
+#ifdef PR_DEBUG
+    if (!component) [[unlikely]]
+      throw NodeError("Null component found during FixedUpdateTree");
+#endif
     component->FixedUpdate();
   }
 
   for (auto &child : _children) {
-    if (child == nullptr) [[unlikely]]
-      throw NodeError("Null child in FixedUpdateTree");
-    
+#ifdef PR_DEBUG
+    if (!child) [[unlikely]]
+      throw NodeError("Null child found during FixedUpdateTree");
+#endif
     child->FixedUpdateTree();
   }
 }

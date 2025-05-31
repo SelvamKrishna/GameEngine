@@ -8,8 +8,11 @@ App::~App() {
   CloseWindow();
 }
 
-void App::Init(const int width, const int height, const char *const title) {
-  InitWindow(width, height, title);
+void App::Init(const int width, const int height, std::string title) {
+#ifdef PR_DEBUG
+  title += " - Development Build";
+#endif
+  InitWindow(width, height, title.c_str());
   SetExitKey(KEY_NULL);
   _isRunning = true;
 }

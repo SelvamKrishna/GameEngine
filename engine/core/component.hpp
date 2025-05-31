@@ -6,19 +6,19 @@ class Node;
 
 class Component {
 private:
-  Node *_owner = nullptr;
-
   friend class Node;
+  
+  Node* _owner = nullptr;
 
 protected:
   std::string _name;
 
-protected:
+private:
   virtual void Update() {}
   virtual void FixedUpdate() {}
 
 public:
-  explicit Component(const std::string &name) noexcept 
+  explicit Component(const std::string &name) noexcept
     : _owner(nullptr), _name(name) {}
 
   virtual ~Component() = default;

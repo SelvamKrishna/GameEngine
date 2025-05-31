@@ -18,7 +18,6 @@ class Node {
 private:
   friend SceneTree;
 
-protected:
   Node *_parent = nullptr;
   std::string _name;
   std::vector<std::unique_ptr<Node>> _children;
@@ -51,8 +50,12 @@ public:
     return _children.size();
   }
 
+  [[nodiscard]] inline const std::vector<std::unique_ptr<Node>> &
+  GetChildren() const noexcept { return _children; }
+
   void AddComponent(std::unique_ptr<Component> component);
   void RemoveComponent(Component *component) noexcept;
+
   [[nodiscard]] Component &GetComponentByIndex(size_t index);
 
   template <typename ComponentT>
@@ -61,7 +64,10 @@ public:
       if (auto casted = dynamic_cast<ComponentT *>(component.get())) return *casted;
     }
 
+#ifdef PR_DEBUG
     throw std::invalid_argument("Component not available");
+#endif
+    return *_components.front();
   }
 
   template <typename ComponentT>
@@ -83,17 +89,25 @@ public:
     return matches;
   }
 
-  [[nodiscard]] inline const Node *GetParent() const noexcept { return _parent; }
-  [[nodiscard]] inline const std::string &GetName() const noexcept { return _name; }
-
-  [[nodiscard]] inline const std::vector<std::unique_ptr<Node>> &
-  GetChildren() const noexcept {
-    return _children;
+  template <typename ComponentT>
+    requires std::is_base_of_v<Component, ComponentT>
+  inline void AttachComponent(ComponentT *component) {
+  #ifdef PR_DEBUG
+    if (!component) throw std::invalid_argument("Component cannot be null");
+  #endif
+    AddComponent(std::unique_ptr<ComponentT>(component));
   }
 
   [[nodiscard]] inline const std::vector<std::unique_ptr<Component>> &
   GetComponents() const noexcept {
     return _components;
+  }
+
+  [[nodiscard]] inline const std::string &GetName() const noexcept {
+    return _name;
+  }
+  [[nodiscard]] inline const Node *GetParent() const noexcept {
+    return _parent;
   }
 
   void Free() noexcept;

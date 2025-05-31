@@ -1,6 +1,7 @@
 #pragma once
 
 #include "scene_tree.hpp"
+#include <string>
 
 class App {
 private:
@@ -24,7 +25,7 @@ public:
     return instance;
   }
 
-  void Init(int width, int height, const char *title);
+  void Init(int width, int height, std::string title);
   void Run();
   void Quit() noexcept;
 

@@ -1,5 +1,6 @@
 CXX := g++
 CXXFLAGS := -std=c++20 -Iinclude -Iengine -Ivendor
+CXXFLAGS += -DPR_DEBUG
 CXXFLAGS += -Wall -Wextra -Werror -O2
 LDFLAGS := vendor/libraylib.a -lwinmm -lgdi32 -lopengl32
 

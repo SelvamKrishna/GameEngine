@@ -6,10 +6,10 @@
 
 class SceneTree {
 private:
+  friend class App;
+
   std::unique_ptr<Node> _root;
   RenderQueue _renderQueue;
-
-  friend class App;
   
 private:
   void Update();
@@ -18,12 +18,12 @@ private:
 
 public:
   SceneTree() = default;
-
-  SceneTree(SceneTree &&other) noexcept = default;
-  SceneTree &operator=(SceneTree &&other) noexcept = default;
+  ~SceneTree();
 
   SceneTree(const SceneTree &) = delete;
+  SceneTree(SceneTree &&other) noexcept = default;
   SceneTree &operator=(const SceneTree &) = delete;
+  SceneTree &operator=(SceneTree &&other) noexcept = default;
 
   void SetRoot(Node *root) noexcept {
     _root.reset(root);
@@ -42,7 +42,7 @@ public:
     return static_cast<bool>(_root);
   }
 
-  [[nodiscard]] inline RenderQueue &GetRenderQueue() noexcept {
-    return _renderQueue;
+  inline void AddRenderCommand(const RenderCommand &command) noexcept {
+    _renderQueue.AddCommand(command);
   }
 };
