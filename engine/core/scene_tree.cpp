@@ -1,14 +1,17 @@
 #include "scene_tree.hpp"
-
-void SceneTree::SetRoot(std::unique_ptr<Node> root) noexcept {
-  _root = std::move(root);
-  if (_root) _root->Init();
-}
+#include "../../vendor/raylib.h"
 
 void SceneTree::Update() {
-  if (_root) _root->UpdateTree();
+  if (_root) [[likely]] _root->UpdateTree();
 }
 
 void SceneTree::FixedUpdate() {
-  if (_root) _root->FixedUpdateTree();
+  if (_root) [[likely]] _root->FixedUpdateTree();
+}
+
+void SceneTree::Render() {
+  BeginDrawing();
+  ClearBackground(BLACK);
+  _renderQueue.Flush();
+  EndDrawing();
 }

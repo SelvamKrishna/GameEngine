@@ -28,17 +28,17 @@ public:
     return instance;
   }
 
-  inline void SetTimeScale(float scale) noexcept { 
-    _timeScale = scale > 0.0f ? scale : 0.0f; 
+  inline void SetTimeScale(float scale) noexcept {
+    _timeScale = scale > 0.0f ? scale : 0.0f;
   }
 
   [[nodiscard]] inline float DeltaTime() const noexcept { return _deltaTime; }
-
   [[nodiscard]] inline float TotalTime() const noexcept { return _totalTime; }
-
   [[nodiscard]] inline float TimeScale() const noexcept { return _timeScale; }
 
-  [[nodiscard]] inline uint64_t FrameCount() const noexcept { return _frameCount; }
+  [[nodiscard]] inline uint64_t FrameCount() const noexcept {
+    return _frameCount;
+  }
 
   [[nodiscard]] inline bool IsPaused() const noexcept { return _isPaused; }
 
@@ -51,8 +51,6 @@ public:
   }
 
   inline void Pause() noexcept { _isPaused = true; }
-
   inline void Unpause() noexcept { _isPaused = false; }
-
   inline void TogglePause() noexcept { _isPaused = !_isPaused; }
 };

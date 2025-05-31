@@ -13,13 +13,10 @@ private:
   ~App();
 
   App(const App &) = delete;
-  App &operator=(const App &) = delete;
   App(App &&) = delete;
+  App &operator=(const App &) = delete;
   App &operator=(App &&) = delete;
 
-  void Update();
-  void Render();
-  
 public:
   [[nodiscard]]
   static inline App &Instance() noexcept {
@@ -32,9 +29,7 @@ public:
   void Quit() noexcept;
 
   [[nodiscard]]
-  inline bool IsRunning() const noexcept {
-    return _isRunning;
-  }
+  inline bool IsRunning() const noexcept { return _isRunning; }
 
   void SetCurrentScene(const SceneTree &) = delete;
   inline void SetCurrentScene(SceneTree &&currentScene) noexcept {
@@ -42,7 +37,7 @@ public:
   }
 
   [[nodiscard]]
-  inline const SceneTree &GetCurrentScene() const noexcept {
+  inline SceneTree &GetCurrentScene() noexcept {
     return _currentScene;
   }
 };

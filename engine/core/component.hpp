@@ -6,7 +6,7 @@ class Node;
 
 class Component {
 private:
-  Node* _owner = nullptr;
+  Node *_owner = nullptr;
 
   friend class Node;
 
@@ -18,10 +18,12 @@ protected:
   virtual void FixedUpdate() {}
 
 public:
-  explicit Component(const std::string& name) noexcept;
+  explicit Component(const std::string &name) noexcept 
+    : _owner(nullptr), _name(name) {}
+
   virtual ~Component() = default;
 
-  [[nodiscard]] Node& GetOwner() noexcept { return *_owner; }
-  [[nodiscard]] const Node& GetOwner() const noexcept { return *_owner; }
-  [[nodiscard]] const std::string& GetName() const noexcept { return _name; }
+  [[nodiscard]] Node &GetOwner() noexcept { return *_owner; }
+  [[nodiscard]] const Node &GetOwner() const noexcept { return *_owner; }
+  [[nodiscard]] const std::string &GetName() const noexcept { return _name; }
 };

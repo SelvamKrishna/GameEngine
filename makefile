@@ -1,6 +1,6 @@
-CXX := clang++
+CXX := g++
 CXXFLAGS := -std=c++20 -Iinclude -Iengine -Ivendor
-# CXXFLAGS += -Wall -Wextra -Werror -O2
+CXXFLAGS += -Wall -Wextra -Werror -O2
 LDFLAGS := vendor/libraylib.a -lwinmm -lgdi32 -lopengl32
 
 ENGINE_DIR := engine

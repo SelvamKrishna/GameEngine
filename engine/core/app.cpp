@@ -3,25 +3,6 @@
 #include "../systems/time.hpp"
 #include "scene_tree.hpp"
 
-void App::Update() {
-  if (WindowShouldClose()) [[unlikely]] Quit();
-
-  constexpr float kFixedDeltaTime = 1.0f / 60.0f;
-
-  while (_accumulator >= kFixedDeltaTime) {
-    _currentScene.FixedUpdate();
-    _accumulator -= kFixedDeltaTime;
-  }
-
-  _currentScene.Update();
-}
-
-void App::Render() {
-  BeginDrawing();
-  ClearBackground(BLACK);
-  EndDrawing();
-}
-
 App::~App() {
   _currentScene = SceneTree();
   CloseWindow();
@@ -31,26 +12,31 @@ void App::Init(const int width, const int height, const char *const title) {
   InitWindow(width, height, title);
   SetExitKey(KEY_NULL);
   _isRunning = true;
-  _accumulator = 0.0f;
 }
 
 void App::Run() {
-  TimeSystem &time = TimeSystem::Instance();
+  constexpr float kFixedDeltaTime = 1.0f / 60.0f;
+  TimeSystem &timeSystem = TimeSystem::Instance();
 
   while (_isRunning) {
     const float kDeltaTime = GetFrameTime();
-    time._deltaTime = kDeltaTime;
+    timeSystem._deltaTime = kDeltaTime;
 
-    if (time.IsPaused()) [[unlikely]] {
-      continue;
-    }
+    if (timeSystem.IsPaused()) [[unlikely]] continue;
 
-    time._totalTime += kDeltaTime;
-    time._frameCount++;
+    timeSystem._totalTime += kDeltaTime;
+    timeSystem._frameCount++;
     _accumulator += kDeltaTime;
 
-    Update();
-    Render();
+    if (WindowShouldClose()) [[unlikely]] _isRunning = false;
+
+    while (_accumulator >= kFixedDeltaTime) {
+      _currentScene.FixedUpdate();
+      _accumulator -= kFixedDeltaTime;
+    }
+
+    _currentScene.Update();
+    _currentScene.Render();
   }
 }
 

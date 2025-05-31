@@ -27,49 +27,61 @@ public:
   constexpr ColorRGBA operator+(const ColorRGBA &other) const noexcept {
     return {
       static_cast<uint8_t>(r + other.r), static_cast<uint8_t>(g + other.g),
-      static_cast<uint8_t>(b + other.b), static_cast<uint8_t>(a + other.a)};
+      static_cast<uint8_t>(b + other.b), static_cast<uint8_t>(a + other.a)
+    };
   }
 
   constexpr ColorRGBA operator-(const ColorRGBA &other) const noexcept {
     return {
       static_cast<uint8_t>(r - other.r), static_cast<uint8_t>(g - other.g),
-      static_cast<uint8_t>(b - other.b), static_cast<uint8_t>(a - other.a)};
+      static_cast<uint8_t>(b - other.b), static_cast<uint8_t>(a - other.a)
+    };
   }
 
   constexpr ColorRGBA operator*(const ColorRGBA &other) const noexcept {
     return {
-      static_cast<uint8_t>(r * other.r / 255), static_cast<uint8_t>(g * other.g / 255),
-      static_cast<uint8_t>(b * other.b / 255), static_cast<uint8_t>(a * other.a / 255)};
+      static_cast<uint8_t>(r * other.r / 255),
+      static_cast<uint8_t>(g * other.g / 255),
+      static_cast<uint8_t>(b * other.b / 255),
+      static_cast<uint8_t>(a * other.a / 255)
+    };
   }
 
   constexpr ColorRGBA operator/(const ColorRGBA &other) const noexcept {
     return {
       static_cast<uint8_t>(r / other.r), static_cast<uint8_t>(g / other.g),
-      static_cast<uint8_t>(b / other.b), static_cast<uint8_t>(a / other.a)};
+      static_cast<uint8_t>(b / other.b), static_cast<uint8_t>(a / other.a)
+    };
   }
 
   constexpr ColorRGBA operator+(uint8_t scalar) const noexcept {
     return {
       static_cast<uint8_t>(r + scalar), static_cast<uint8_t>(g + scalar),
-      static_cast<uint8_t>(b + scalar), static_cast<uint8_t>(a + scalar)};
+      static_cast<uint8_t>(b + scalar), static_cast<uint8_t>(a + scalar)
+    };
   }
 
   constexpr ColorRGBA operator-(uint8_t scalar) const noexcept {
     return {
       static_cast<uint8_t>(r - scalar), static_cast<uint8_t>(g - scalar),
-      static_cast<uint8_t>(b - scalar), static_cast<uint8_t>(a - scalar)};
+      static_cast<uint8_t>(b - scalar), static_cast<uint8_t>(a - scalar)
+    };
   }
 
   constexpr ColorRGBA operator*(uint8_t scalar) const noexcept {
     return {
-      static_cast<uint8_t>(r * scalar / 255), static_cast<uint8_t>(g * scalar / 255),
-      static_cast<uint8_t>(b * scalar / 255), static_cast<uint8_t>(a * scalar / 255)};
+      static_cast<uint8_t>(r * scalar / 255),
+      static_cast<uint8_t>(g * scalar / 255),
+      static_cast<uint8_t>(b * scalar / 255),
+      static_cast<uint8_t>(a * scalar / 255)
+    };
   }
 
   constexpr ColorRGBA operator/(uint8_t scalar) const noexcept {
     return {
       static_cast<uint8_t>(r / scalar), static_cast<uint8_t>(g / scalar),
-      static_cast<uint8_t>(b / scalar), static_cast<uint8_t>(a / scalar)};
+      static_cast<uint8_t>(b / scalar), static_cast<uint8_t>(a / scalar)
+    };
   }
 
   ColorRGBA &operator+=(const ColorRGBA &other) noexcept {
@@ -149,7 +161,8 @@ public:
       static_cast<uint8_t>((hex >> 24) & 0xFF),
       static_cast<uint8_t>((hex >> 16) & 0xFF),
       static_cast<uint8_t>((hex >> 8) & 0xFF),
-      static_cast<uint8_t>(hex & 0xFF)};
+      static_cast<uint8_t>(hex & 0xFF)
+    };
   }
 
   static ColorRGBA FromHex(const char *hex) noexcept {
@@ -157,23 +170,29 @@ public:
   }
 
   [[nodiscard]] constexpr uint32_t ToHex() const noexcept {
-    return 
+    return \
       (static_cast<uint32_t>(r) << 24) | (static_cast<uint32_t>(g) << 16) |
       (static_cast<uint32_t>(b) << 8) | static_cast<uint32_t>(a);
   }
 
   [[nodiscard]] constexpr ColorRGBA Inverted() const noexcept {
     return {
-      static_cast<uint8_t>(UINT8_MAX - r), 
-      static_cast<uint8_t>(UINT8_MAX - g), 
-      static_cast<uint8_t>(UINT8_MAX - b), a};
+      static_cast<uint8_t>(UINT8_MAX - r),
+      static_cast<uint8_t>(UINT8_MAX - g),
+      static_cast<uint8_t>(UINT8_MAX - b), 
+      a
+    };
   }
 
   [[nodiscard]] constexpr ColorRGBA Grayscale() const noexcept {
     constexpr float kLuminosityR = 0.3f;
     constexpr float kLuminosityG = 0.59f;
     constexpr float kLuminosityB = 0.11f;
-    const uint8_t kGray = static_cast<uint8_t>(r * kLuminosityR + g * kLuminosityG + b * kLuminosityB);
+    
+    const uint8_t kGray = static_cast<uint8_t>(
+      r * kLuminosityR + g * kLuminosityG + b * kLuminosityB
+    );
+    
     return {kGray, kGray, kGray, a};
   }
 
@@ -185,5 +204,8 @@ public:
   inline static constexpr ColorRGBA Yellow() noexcept { return {255, 255, 0}; }
   inline static constexpr ColorRGBA Cyan() noexcept { return {0, 255, 255}; }
   inline static constexpr ColorRGBA Magenta() noexcept { return {255, 0, 255}; }
-  inline static constexpr ColorRGBA Transparent() noexcept { return {0, 0, 0, 0}; }
+
+  inline static constexpr ColorRGBA Transparent() noexcept {
+    return {0, 0, 0, 0};
+  }
 };

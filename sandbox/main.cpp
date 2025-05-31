@@ -1,80 +1,74 @@
 #include "../engine/core/app.hpp"
+#include "../engine/utils/vec2.hpp"
 #include "../engine/utils/core_utils.hpp"
-#include "../engine/systems/time.hpp"
-#include <iostream>
-#include <string>
+#include <utility>
 
-class Sample : public Node {
+class Sprite : public Component, public RenderCommand {
 private:
-  int flag;
-
-public:
-  Sample(const std::string &name) : Node(name) {
-    std::cout << "created: " << _name << "\n";
-  }
-
-  void Init() final {
-    flag = 0;    
-  }
-
   void Update() final {
-    // std::cout << "updating: " << _name << "\n";
-    flag ++;
-
-    if (flag > 25 && GetChildCount() > 0) {
-      RemoveChild(&GetChildByIndex(0));
+    if (IsKeyPressed(KEY_W)) {
+      destRect.y -= 10.0f;
     }
-  }
 
-  void FixedUpdate() final {
-    // std::cout << "fixed updating: " << _name << "\n";
+    App::Instance().GetCurrentScene().GetRenderQueue().AddCommand(*this);
   }
-
-  ~Sample() {
-    std::cout << "destroyed: " << _name << "\n";
-  }
-};
-
-class Sample2 : public Node {
-public:
-  Sample2(const std::string &name) : Node(name) {
-    std::cout << "created: " << _name << "\n";
-  }
-
-  ~Sample2() {
-    std::cout << "destroyed: " << _name << "\n";
-  }
-};
-
-class ShowDeltaTimeComp : public Component {
-private:
-  void Update() final {
-    std::cout << "deltaTime: " << TimeSystem::Instance().DeltaTime() << "\n";
-  }
-
   void FixedUpdate() final {}
 
 public:
-  ShowDeltaTimeComp(const std::string &name) : Component(name) {
-    std::cout << "created comp: " << _name << "\n";
+  Sprite(std::string name, std::string texturePath, Vec2 position, Vec2 size)
+  : Component(name) {
+    texture = LoadTexture(texturePath.c_str());
+
+    if (texture.id == 0)
+      throw std::runtime_error("Failed to load texture");
+    
+    sourceRect = Rect(0, 0, static_cast<float>(texture.width), static_cast<float>(texture.height));
+    destRect = Rect(position.x, position.y, sourceRect.width * size.x, sourceRect.height *size.y);
+    rotation = 0.0f;
+    tint = ColorRGBA::White();
+    zIndex = 0;
   }
 
-  ~ShowDeltaTimeComp() {
-    std::cout << "destroyed comp: " << _name << "\n";
+  ~Sprite() override {
+    UnloadTexture(texture);
   }
+};
+
+class BananaMover : public Component {
+private:
+  Sprite *sprite;
+
+private:
+  void Update() override {
+    if (IsKeyPressed(KEY_SPACE)) sprite->zIndex = sprite->zIndex == 2 ? -1 : 2;
+  }
+
+public:
+  BananaMover(Sprite *s) : Component("ZToggle"), sprite(s) {}
 };
 
 int main() {
   App &app = App::Instance();
-  app.Init(800, 800, "Sandbox #1");
+  app.Init(800, 800, "Render System Z-Index Test");
 
-  auto node = MakeNode<Sample>("Sample root");
-  node->AddChild(MakeNode<Sample2>("Sample2 child"));
-  node->AddComponent(MakeComponent<ShowDeltaTimeComp>("C2 Comp 1"));
+  SceneTree sceneTree;
+  Node *rootNode = new Node("Root Node");
 
-  SceneTree tree;
-  tree.SetRoot(std::move(node));
+  auto spriteMango = new Sprite("Mango", "assets/mango.jpeg", Vec2(300, 300), Vec2::One());
+  spriteMango->zIndex = 0;
+  rootNode->AddComponent(std::unique_ptr<Sprite>(spriteMango));
 
-  app.SetCurrentScene(std::move(tree));
+  auto spriteApple = new Sprite("Apple", "assets/apple.jpg", Vec2(320, 320), Vec2::One());
+  spriteApple->zIndex = 1;
+  rootNode->AddComponent(std::unique_ptr<Sprite>(spriteApple));
+
+  auto spriteBanana = new Sprite("Banana", "assets/banana.jpg", Vec2(340, 340), Vec2::One());
+  spriteBanana->zIndex = 2;
+  rootNode->AddComponent(std::unique_ptr<Sprite>(spriteBanana));
+
+  rootNode->AddComponent(MakeComponent<BananaMover>(spriteBanana));
+
+  sceneTree.SetRoot(rootNode);
+  app.SetCurrentScene(std::move(sceneTree));
   app.Run();
 }
