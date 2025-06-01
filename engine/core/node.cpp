@@ -6,7 +6,10 @@
 #include <format>
 #endif
 
-Node::Node(const std::string &name) : _parent(nullptr), _name(name) {}
+Node::Node(const std::string &name) 
+  : _parent(nullptr)
+  , _name(name)
+  , _components(this) {}
 
 void Node::AddChild(std::unique_ptr<Node> child) {
 #ifdef PR_DEBUG
@@ -58,44 +61,9 @@ Node &Node::GetChildByName(std::string_view name) {
   return *_children.front();
 }
 
-void Node::AddComponent(std::unique_ptr<Component> component) {
-  component->_owner = this;
-  _components.emplace_back(std::move(component));
-}
-
-void Node::RemoveComponent(Component *component) noexcept {
-  auto it = std::ranges::find_if(
-    _components, 
-    [component](const std::unique_ptr<Component> &ptr) {
-      return ptr.get() == component;
-    }
-  );
-
-  if (it != _components.end()) [[likely]] {
-    (*it)->_owner = nullptr;
-    _components.erase(it);
-  }
-}
-
-Component &Node::GetComponentByIndex(size_t index) {
-#ifdef PR_DEBUG
-  if (index >= _components.size()) [[unlikely]]
-    throw std::out_of_range("Component index out of range");
-#endif
-
-  return *_components[index];
-}
-
 void Node::UpdateTree() {
   Update();
-
-  for (auto &component : _components) {
-#ifdef PR_DEBUG
-    if (!component) [[unlikely]]
-      throw NodeError("Null component found during UpdateTree");
-#endif
-    component->Update();
-  }
+  _components.UpdateAll();
 
   for (auto &child : _children) {
 #ifdef PR_DEBUG
@@ -108,15 +76,8 @@ void Node::UpdateTree() {
 
 void Node::FixedUpdateTree() {
   FixedUpdate();
-
-  for (auto &component : _components) {
-#ifdef PR_DEBUG
-    if (!component) [[unlikely]]
-      throw NodeError("Null component found during FixedUpdateTree");
-#endif
-    component->FixedUpdate();
-  }
-
+  _components.FixedUpdateAll();
+  
   for (auto &child : _children) {
 #ifdef PR_DEBUG
     if (!child) [[unlikely]]
@@ -132,5 +93,4 @@ void Node::Free() noexcept {
   for (auto &child : _children) child->Free();
 
   _children.clear();
-  _components.clear();
 }

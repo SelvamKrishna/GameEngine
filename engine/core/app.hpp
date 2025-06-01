@@ -5,9 +5,9 @@
 
 class App {
 private:
-  bool _isRunning = false;
   SceneTree _currentScene;
   float _accumulator = 0.0f;
+  bool _isRunning = false;
 
 private:
   App() = default;

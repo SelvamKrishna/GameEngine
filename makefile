@@ -1,7 +1,10 @@
 CXX := g++
 CXXFLAGS := -std=c++20 -Iinclude -Iengine -Ivendor
-CXXFLAGS += -DPR_DEBUG
-CXXFLAGS += -Wall -Wextra -Werror -O2
+
+DEBUG_FLAGS := -DPR_DEBUG -Wall -Wextra -g
+DEBUG_FLAGS += -O2
+RELEASE_FLAGS := -DNDEBUG -O3 -Wall -Wextra -Werror
+
 LDFLAGS := vendor/libraylib.a -lwinmm -lgdi32 -lopengl32
 
 ENGINE_DIR := engine
@@ -17,7 +20,13 @@ SANDBOX_OBJ := $(SANDBOX_SRC:$(SANDBOX_DIR)/%.cpp=$(BUILD_DIR)/sandbox/%.o)
 ENGINE_LIB := $(BUILD_DIR)/libengine.a
 SANDBOX_BIN := $(BUILD_DIR)/sandbox.exe
 
-all: $(SANDBOX_BIN)
+all: debug
+
+debug: CXXFLAGS += $(DEBUG_FLAGS)
+debug: $(SANDBOX_BIN)
+
+release: CXXFLAGS += $(RELEASE_FLAGS)
+release: $(SANDBOX_BIN)
 
 $(ENGINE_LIB): $(ENGINE_OBJ)
 	if not exist "$(dir $@)" mkdir "$(dir $@)"
@@ -35,7 +44,10 @@ $(SANDBOX_BIN): $(SANDBOX_OBJ) $(ENGINE_LIB)
 	if not exist "$(BUILD_DIR)" mkdir "$(BUILD_DIR)"
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
+run: debug
+	./$(SANDBOX_BIN)
+
 clean:
 	if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
 
-.PHONY: all clean
+.PHONY: all debug release run clean

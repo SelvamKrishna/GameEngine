@@ -20,13 +20,13 @@ int main() {
   spriteBanana->zIndex = 2;
   auto bananaZToggle = new SpriteZToggle("BananaZToggle", spriteBanana);
 
-  rootNode->AttachComponent(spriteMango);
+  rootNode->Components().Add(spriteMango);
 
-  rootNode->AttachComponent(spriteApple);
-  rootNode->AttachComponent(appleMover);
+  rootNode->Components().Add(spriteApple);
+  rootNode->Components().Add(appleMover);
   
-  rootNode->AttachComponent(spriteBanana);
-  rootNode->AttachComponent(bananaZToggle);
+  rootNode->Components().Add(spriteBanana);
+  rootNode->Components().Add(bananaZToggle);
 
   sceneTree.SetRoot(rootNode);
   app.SetCurrentScene(std::move(sceneTree));
