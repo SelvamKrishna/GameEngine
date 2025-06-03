@@ -1,7 +1,6 @@
 #include "app.hpp"
 #include "../../vendor/raylib.h"
 #include "../systems/time.hpp"
-#include "scene_tree.hpp"
 
 App::~App() {
   _currentScene = SceneTree();

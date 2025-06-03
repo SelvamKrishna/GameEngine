@@ -40,7 +40,7 @@ private:
   std::vector<RenderCommand> _commandBuffer;
   bool _dirty = false;
 
-  static constexpr size_t DefaultCommandBufferCap = 512;
+  static constexpr size_t DEFAULT_BUFFER_CAP = 512;
 
 private:
   void SortByZIndex();

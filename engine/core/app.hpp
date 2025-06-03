@@ -38,7 +38,5 @@ public:
   }
 
   [[nodiscard]]
-  inline SceneTree &GetCurrentScene() noexcept {
-    return _currentScene;
-  }
+  inline SceneTree &GetCurrentScene() noexcept { return _currentScene; }
 };

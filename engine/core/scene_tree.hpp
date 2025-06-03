@@ -30,17 +30,13 @@ public:
     if (_root) [[likely]] _root->Init();
   }
 
-  [[nodiscard]] inline Node *GetRoot() noexcept {
-    return _root.get();
-  }
+  [[nodiscard]] inline Node *GetRoot() noexcept { return _root.get(); }
 
-  [[nodiscard]] inline const Node *GetRoot() const noexcept {
-    return _root.get();
-  }
+  [[nodiscard]] 
+  inline const Node *GetRoot() const noexcept { return _root.get(); }
 
-  [[nodiscard]] bool HasRoot() const noexcept {
-    return static_cast<bool>(_root);
-  }
+  [[nodiscard]] 
+  bool HasRoot() const noexcept { return static_cast<bool>(_root); }
 
   inline void AddRenderCommand(const RenderCommand &command) noexcept {
     _renderQueue.AddCommand(command);

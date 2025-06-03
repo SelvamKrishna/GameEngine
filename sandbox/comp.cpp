@@ -2,7 +2,7 @@
 #include "../engine/utils/vec2.hpp"
 #include "../engine/systems/time.hpp"
 
-class Sprite : public Component, public RenderCommand {
+class Sprite : public Node, public RenderCommand {
 private:
   void Update() final {
     App::Instance().GetCurrentScene().AddRenderCommand(*this);
@@ -12,7 +12,7 @@ private:
 
 public:
   Sprite(std::string name, std::string texturePath, Vec2 position, Vec2 size)
-  : Component(name) {
+  : Node(name) {
     texture = LoadTexture(texturePath.c_str());
 
     if (texture.id == 0)
@@ -30,7 +30,7 @@ public:
   }
 };
 
-class SpriteZToggle : public Component {
+class SpriteZToggle : public Node {
 private:
   Sprite *sprite;
 
@@ -40,12 +40,12 @@ private:
   }
 
 public:
-  SpriteZToggle(std::string name, Sprite *s) : Component(name), sprite(s) {}
+  SpriteZToggle(std::string name, Sprite *s) : Node(name), sprite(s) {}
 
   ~SpriteZToggle() override = default;
 };
 
-class SpriteMover : public Component {
+class SpriteMover : public Node {
 private:
   Sprite *sprite;
   float speed;
@@ -76,7 +76,7 @@ private:
 
 public:
   SpriteMover(std::string name, Sprite *s, float moveSpeed)
-  : Component(name), sprite(s), speed(moveSpeed) {
+  : Node(name), sprite(s), speed(moveSpeed) {
     if (!sprite) throw std::runtime_error("Sprite cannot be null");
   }
 

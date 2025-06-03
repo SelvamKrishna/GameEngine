@@ -1,10 +1,9 @@
 #pragma once
 
-#include "component.hpp"
+#include <cassert>
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <string_view>
 #include <vector>
 
 class SceneTree;
@@ -18,10 +17,11 @@ class Node {
 private:
   friend SceneTree;
 
+  using Children = std::vector<std::unique_ptr<Node>>;
+
   Node *_parent = nullptr;
   std::string _name;
-  std::vector<std::unique_ptr<Node>> _children;
-  ComponentContainer _components;
+  std::unique_ptr<Children> _children;
 
 private:
   virtual void Init() {}
@@ -42,17 +42,16 @@ public:
 
   void Free() noexcept;
 
-  void AddChild(std::unique_ptr<Node> child);
+  void AddChild(Node *child);
   void RemoveChild(Node *child) noexcept;
 
   [[nodiscard]] Node &GetChildByIndex(size_t index);
   [[nodiscard]] Node &GetChildByName(std::string_view name);
-  [[nodiscard]] inline size_t GetChildCount() const noexcept { return _children.size(); }
-  
-  [[nodiscard]] inline const Node *GetParent() const noexcept { return _parent; }
-  [[nodiscard]] inline const std::string &GetName() const noexcept { return _name; }
-  [[nodiscard]] inline ComponentContainer &Components() noexcept { return _components; }
 
-  [[nodiscard]] inline const std::vector<std::unique_ptr<Node>> &
-  GetChildren() const noexcept { return _children; }
+  [[nodiscard]] inline size_t GetChildCount() const noexcept { return _children->size(); }
+  [[nodiscard]] inline const Node *GetParent() const noexcept { return _parent; }
+  [[nodiscard]] inline std::string_view GetName() const noexcept { return _name; }
+
+  [[nodiscard]] inline const Children*
+  GetChildren() const noexcept { return _children.get(); }
 };

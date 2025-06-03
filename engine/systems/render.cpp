@@ -43,7 +43,7 @@ void RenderQueue::SortByZIndex() {
 }
 
 RenderQueue::RenderQueue() noexcept {
-  _commandBuffer.reserve(DefaultCommandBufferCap);
+  _commandBuffer.reserve(DEFAULT_BUFFER_CAP);
 }
 
 void RenderQueue::AddCommand(const RenderCommand &command) noexcept {
