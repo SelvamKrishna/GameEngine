@@ -1,35 +1,42 @@
 #pragma once
 
-#include <cassert>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
 class SceneTree;
 
-class NodeError : public std::runtime_error {
-public:
-  using std::runtime_error::runtime_error;
-};
-
 class Node {
+private:
+  using ChildrenArray = std::vector<std::unique_ptr<Node>>;
+
+  enum class ErrorCode : uint8_t {
+    Success,
+    NullChild,
+    ChildWithNameExists,
+  };
+
+  enum class State : uint8_t {
+    Uninitialized,
+    Active,
+    Disabled,
+  };
+
 private:
   friend SceneTree;
 
-  using Children = std::vector<std::unique_ptr<Node>>;
-
-  Node *_parent = nullptr;
   std::string _name;
-  std::unique_ptr<Children> _children;
+  Node *_parent = nullptr;
+  std::unique_ptr<ChildrenArray> _children;
+  State _state = State::Uninitialized;
 
 private:
-  virtual void Init() {}
-  virtual void Update() {}
-  virtual void FixedUpdate() {}
+  virtual void _Init() { _state = State::Active; }
+  virtual void _Update() {}
+  virtual void _FixedUpdate() {}
 
-  void UpdateTree();
-  void FixedUpdateTree();
+  ErrorCode _UpdateTree();
+  ErrorCode _FixedUpdateTree();
 
 public:
   explicit Node(const std::string &name);
@@ -42,16 +49,17 @@ public:
 
   void Free() noexcept;
 
-  void AddChild(Node *child);
-  void RemoveChild(Node *child) noexcept;
+  ErrorCode AddChild(Node *child) noexcept;
+  ErrorCode RemoveChild(Node *child) noexcept;
 
-  [[nodiscard]] Node &GetChildByIndex(size_t index);
-  [[nodiscard]] Node &GetChildByName(std::string_view name);
+  [[nodiscard]] Node &ChildByIndex(size_t index);
+  [[nodiscard]] Node &ChildByName(std::string_view name);
 
-  [[nodiscard]] inline size_t GetChildCount() const noexcept { return _children->size(); }
-  [[nodiscard]] inline const Node *GetParent() const noexcept { return _parent; }
-  [[nodiscard]] inline std::string_view GetName() const noexcept { return _name; }
+  [[nodiscard]] inline size_t ChildCount() const noexcept { return _children->size(); }
+  [[nodiscard]] inline const Node *Parent() const noexcept { return _parent; }
+  [[nodiscard]] inline std::string_view Name() const noexcept { return _name; }
 
-  [[nodiscard]] inline const Children*
-  GetChildren() const noexcept { return _children.get(); }
+  [[nodiscard]] inline const ChildrenArray *Children() const noexcept {
+    return _children ? _children.get() : nullptr;
+  }
 };

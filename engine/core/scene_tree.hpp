@@ -1,7 +1,7 @@
 #pragma once
 
-#include "node.hpp"
 #include "../systems/render.hpp"
+#include "node.hpp"
 #include <memory>
 
 class SceneTree {
@@ -10,11 +10,10 @@ private:
 
   std::unique_ptr<Node> _root;
   RenderSystem2D _renderQueue;
-  
+
 private:
-  void Update();
-  void FixedUpdate();
-  void Render();
+  void _FixedProcess();
+  void _Process();
 
 public:
   SceneTree() = default;
@@ -27,16 +26,11 @@ public:
 
   void SetRoot(Node *root) noexcept {
     _root.reset(root);
-    if (_root) [[likely]] _root->Init();
+    if (_root) [[likely]] _root->_Init();
   }
 
-  [[nodiscard]] inline Node *GetRoot() noexcept { return _root.get(); }
-
-  [[nodiscard]] 
-  inline const Node *GetRoot() const noexcept { return _root.get(); }
-
-  [[nodiscard]] 
-  bool HasRoot() const noexcept { return static_cast<bool>(_root); }
+  [[nodiscard]] inline Node *Root() noexcept { return _root.get(); }
+  [[nodiscard]] inline const Node *Root() const noexcept { return _root.get(); }
 
   inline void AddRenderCommand(const components::RenderCommand2D &command) noexcept {
     _renderQueue.AddCommand(command);

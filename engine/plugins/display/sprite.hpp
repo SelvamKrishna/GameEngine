@@ -5,15 +5,13 @@
 
 class Sprite2D : public Node, public components::RenderCommand2D {
 private:
-  void Update() override;
-  void FixedUpdate() override {}
+  void _Update() override;
+  void _FixedUpdate() override {}
 
 public:
   Sprite2D(
-    std::string name, 
-    std::string texturePath,
-    const components::Transform2D &transform, int8_t zIndex = 0,
-    ColorRGBA tint = ColorRGBA::White()
+    std::string name,
+    components::RenderCommand2D renderCommand
   );
 
   ~Sprite2D() override;

@@ -2,8 +2,7 @@
 #include <algorithm>
 
 void RenderSystem2D::SortByZIndex() {
-  if (_dirty) std::sort(_commandBuffer.begin(), _commandBuffer.end());
-  _dirty = false;
+  std::sort(_commandBuffer.begin(), _commandBuffer.end());
 }
 
 RenderSystem2D::RenderSystem2D() noexcept {
@@ -12,7 +11,6 @@ RenderSystem2D::RenderSystem2D() noexcept {
 
 void RenderSystem2D::AddCommand(const components::RenderCommand2D &command) noexcept {
   _commandBuffer.emplace_back(command);
-  _dirty = true;
 }
 
 void RenderSystem2D::Flush() {

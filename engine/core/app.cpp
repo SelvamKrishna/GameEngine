@@ -9,7 +9,7 @@ App::~App() {
 
 void App::Init(const int width, const int height, std::string title) {
 #ifdef PR_DEBUG
-  title += " - Development Build";
+  title += " - Debug Build";
 #endif
   InitWindow(width, height, title.c_str());
   SetExitKey(KEY_NULL);
@@ -17,7 +17,6 @@ void App::Init(const int width, const int height, std::string title) {
 }
 
 void App::Run() {
-  constexpr float kFixedDeltaTime = 1.0f / 60.0f;
   TimeSystem &timeSystem = TimeSystem::Instance();
 
   while (_isRunning) {
@@ -26,20 +25,16 @@ void App::Run() {
 
     if (timeSystem.IsPaused()) [[unlikely]] continue;
 
-    timeSystem._totalTime += kDeltaTime;
-    timeSystem._frameCount++;
+    timeSystem._UpdateInfo();
     _accumulator += kDeltaTime;
 
     if (WindowShouldClose()) [[unlikely]] _isRunning = false;
 
     while (_accumulator >= kFixedDeltaTime) {
-      _currentScene.FixedUpdate();
+      _currentScene._FixedProcess();
       _accumulator -= kFixedDeltaTime;
     }
 
-    _currentScene.Update();
-    _currentScene.Render();
+    _currentScene._Process();
   }
 }
-
-void App::Quit() noexcept { _isRunning = false; }

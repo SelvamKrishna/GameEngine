@@ -6,15 +6,12 @@ SceneTree::~SceneTree() {
   _root.reset();
 }
 
-void SceneTree::Update() {
-  if (_root) [[likely]] _root->UpdateTree();
+void SceneTree::_FixedProcess() {
+  if (_root) [[likely]] _root->_FixedUpdateTree();
 }
 
-void SceneTree::FixedUpdate() {
-  if (_root) [[likely]] _root->FixedUpdateTree();
-}
-
-void SceneTree::Render() {
+void SceneTree::_Process() {
+  if (_root) [[likely]] _root->_UpdateTree();
   BeginDrawing();
   ClearBackground(BLACK);
 #ifdef PR_DEBUG
@@ -22,4 +19,5 @@ void SceneTree::Render() {
 #endif
   _renderQueue.Flush();
   EndDrawing();
+
 }

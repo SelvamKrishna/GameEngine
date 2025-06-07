@@ -11,16 +11,22 @@ int main() {
 
   auto spriteMango = new Sprite2D(
     "Mango", 
-    "assets/mango.jpeg",
-    components::Transform2D(Vec2(300, 300)),
-    0
+    components::RenderCommand2DBuilder()
+      .LoadTextureFromFile("assets/mango.jpeg")
+      .DefaultSourceRect()
+      .SetDestRect(components::Postion2D(100, 100))
+      .SetZIndex(0)
+    .Build()
   );
 
   auto spriteApple = new Sprite2D(
-    "Apple", 
-    "assets/apple.jpg", 
-    components::Transform2D(Vec2(200, 200)),
-    1
+    "Apple",
+    components::RenderCommand2DBuilder()
+      .LoadTextureFromFile("assets/apple.jpg")
+      .DefaultSourceRect()
+      .SetDestRect(components::Postion2D(200, 200))
+      .SetZIndex(1)
+    .Build()
   );
   
   auto appleMover = new SpriteMover(
@@ -31,9 +37,12 @@ int main() {
 
   auto spriteBanana = new Sprite2D(
     "Banana",
-    "assets/banana.jpg", 
-    components::Transform2D(Vec2(400, 400)),
-    2
+    components::RenderCommand2DBuilder()
+      .LoadTextureFromFile("assets/banana.jpg")
+      .DefaultSourceRect()
+      .SetDestRect(components::Postion2D(300, 300))
+      .SetZIndex(2)
+    .Build()
   );
 
   auto bananaZToggle = new SpriteZToggle(
@@ -42,10 +51,8 @@ int main() {
   );
 
   rootNode->AddChild(spriteMango);
-
   rootNode->AddChild(spriteApple);
   rootNode->AddChild(appleMover);
-  
   rootNode->AddChild(spriteBanana);
   rootNode->AddChild(bananaZToggle);
 

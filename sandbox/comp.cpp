@@ -1,13 +1,14 @@
 #include "../engine/utils/vec2.hpp"
 #include "../engine/systems/time.hpp"
 #include "../engine/plugins/display/sprite.hpp"
+#include <stdexcept>
 
 class SpriteZToggle : public Node {
 private:
   Sprite2D *sprite;
 
 private:
-  void Update() override {
+  void _Update() override {
     if (IsKeyPressed(KEY_SPACE)) sprite->zIndex = sprite->zIndex == 2 ? -1 : 2;
   }
 
@@ -24,8 +25,8 @@ private:
   Vec2 vel;
 
 private:
-  void Update() final {
-    vel.y = IsKeyDown(KEY_S) + IsKeyDown(KEY_W);
+  void _Update() final {
+    vel.y = IsKeyDown(KEY_S) - IsKeyDown(KEY_W);
     vel.x = IsKeyDown(KEY_D) - IsKeyDown(KEY_A);
 
     if (vel != Vec2::Zero()) {
@@ -35,7 +36,7 @@ private:
     }
   }
 
-  void FixedUpdate() final {}
+  void _FixedUpdate() final {}
 
 public:
   SpriteMover(std::string name, Sprite2D *s, float moveSpeed)

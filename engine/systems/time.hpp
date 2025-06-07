@@ -4,13 +4,13 @@
 
 class TimeSystem {
 private:
+  friend App;
+
   float _deltaTime;
   float _totalTime = 0.0f;
   float _timeScale = 1.0f;
   uint64_t _frameCount = 0;
   bool _isPaused = false;
-
-  friend App;
 
 private:
   TimeSystem() = default;
@@ -20,6 +20,11 @@ private:
   TimeSystem(TimeSystem &&) = delete;
   TimeSystem &operator=(const TimeSystem &) = delete;
   TimeSystem &operator=(TimeSystem &&) = delete;
+
+  inline void _UpdateInfo() noexcept {
+    _totalTime += _deltaTime;
+    _frameCount++;
+  }
 
 public:
   [[nodiscard]]
@@ -35,11 +40,7 @@ public:
   [[nodiscard]] inline float DeltaTime() const noexcept { return _deltaTime; }
   [[nodiscard]] inline float TotalTime() const noexcept { return _totalTime; }
   [[nodiscard]] inline float TimeScale() const noexcept { return _timeScale; }
-
-  [[nodiscard]] inline uint64_t FrameCount() const noexcept {
-    return _frameCount;
-  }
-
+  [[nodiscard]] inline uint64_t FrameCount() const noexcept { return _frameCount; }
   [[nodiscard]] inline bool IsPaused() const noexcept { return _isPaused; }
 
   [[nodiscard]] inline uint64_t FPS() const noexcept {

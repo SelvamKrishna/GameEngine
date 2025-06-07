@@ -5,10 +5,9 @@
 
 class RenderSystem2D {
 private:
-  std::vector<components::RenderCommand2D> _commandBuffer;
-  bool _dirty = false;
-
   static constexpr size_t DEFAULT_BUFFER_CAP = 512;
+
+  std::vector<components::RenderCommand2D> _commandBuffer;
 
 private:
   void SortByZIndex();

@@ -5,6 +5,9 @@
 
 class App {
 private:
+  static constexpr float kFixedFrameRate = 60.0f;
+  static constexpr float kFixedDeltaTime = 1.0f / kFixedFrameRate;
+
   SceneTree _currentScene;
   float _accumulator = 0.0f;
   bool _isRunning = false;
@@ -27,16 +30,22 @@ public:
 
   void Init(int width, int height, std::string title);
   void Run();
-  void Quit() noexcept;
+  inline void Quit() noexcept { _isRunning = false; }
 
-  [[nodiscard]]
-  inline bool IsRunning() const noexcept { return _isRunning; }
+  [[nodiscard]] inline float Accumulator() const noexcept {
+    return _accumulator;
+  }
+
+  [[nodiscard]] inline bool IsRunning() const noexcept {
+    return _isRunning;
+  }
 
   void SetCurrentScene(const SceneTree &) = delete;
   inline void SetCurrentScene(SceneTree &&currentScene) noexcept {
     _currentScene = std::move(currentScene);
   }
 
-  [[nodiscard]]
-  inline SceneTree &GetCurrentScene() noexcept { return _currentScene; }
+  [[nodiscard]] inline SceneTree &CurrentScene() noexcept {
+    return _currentScene;
+  }
 };

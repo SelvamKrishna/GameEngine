@@ -1,90 +1,109 @@
 #include "node.hpp"
-#include "debug.hpp"
 #include <algorithm>
-#include <memory>
+#include <exception>
+#include <cassert>
 
-#ifdef PR_DEBUG
-#include <format>
-#endif
+Node::Node(const std::string &name) : _name(name) {}
 
-Node::Node(const std::string &name)
-  : _name(name) {}
+Node::ErrorCode Node::_UpdateTree() {
+  if (_state != State::Active) return ErrorCode::Success;
+
+  _Update();
+
+  if (!_children) return ErrorCode::Success;
+
+  ErrorCode error;
+  for (auto &child : *_children) {
+    if (!child) return ErrorCode::NullChild;
+
+    error = child->_UpdateTree(); 
+    if (error != ErrorCode::Success) return error;
+  }
+
+  return ErrorCode::Success;
+}
+
+Node::ErrorCode Node::_FixedUpdateTree() {
+  if (_state != State::Active) return ErrorCode::Success;
+
+  _FixedUpdate();
+
+  if (!_children) return ErrorCode::Success;
+
+  ErrorCode error;
+  for (auto &child : *_children) {
+    if (!child) return ErrorCode::NullChild;
+
+    if (child->_state != State::Active) continue;
+
+    error = child->_FixedUpdateTree(); 
+    if (error != ErrorCode::Success) return error;
+  }
+
+  return ErrorCode::Success;
+}
 
 void Node::Free() noexcept {
   _parent = nullptr;
   _children.reset();
+  _state = State::Uninitialized;
 }
 
-void Node::AddChild(Node *child) {
-  PR_ASSERT_NODE(child != nullptr, "Cannot add null child");
+Node::ErrorCode Node::AddChild(Node *child) noexcept {
+  if (!child) return ErrorCode::NullChild;
 
-  if (!_children) _children = std::make_unique<Children>();
+  if (!_children) _children = std::make_unique<ChildrenArray>();
 
-  PR_ASSERT_NODE(
-    !std::ranges::any_of(*_children, [&](const auto &existing) {
-      return existing->_name == child->_name;
-    }),
-    std::format("Child with name '{}' already exists.", child->_name)
-  );
+  auto &arr = *_children;
 
-  child->_parent = this;
-  child->Init();
-  _children->emplace_back(std::unique_ptr<Node>(child));
-}
-
-void Node::RemoveChild(Node *child) noexcept {
-  if (!child || !_children) return;
-
-  auto &vec = *_children;
-  auto it = std::remove_if(vec.begin(), vec.end(),
-    [child](const std::unique_ptr<Node> &ptr) {
-      return ptr.get() == child;
+  bool childExists = std::ranges::any_of(
+    arr, 
+    [&child](const auto &existing) {
+      return existing && existing->_name == child->_name;
     }
   );
 
-  if (it != vec.end()) {
-    (*it)->_parent = nullptr;
-    vec.erase(it, vec.end());
-  }
+  if (childExists) return ErrorCode::ChildWithNameExists;
 
-  if (_children->empty()) _children.reset();
+  child->_parent = this;
+  child->_Init();
+
+  arr.emplace_back(child);
+  return ErrorCode::Success;
 }
 
-Node &Node::GetChildByIndex(size_t index) {
-  PR_ASSERT_NODE(_children && index < _children->size(), "Child index out of range");
+Node::ErrorCode Node::RemoveChild(Node *child) noexcept {
+  if (!child || !_children) return ErrorCode::NullChild;
+
+  auto &arr = *_children;
+
+  auto it = std::remove_if(
+    arr.begin(), arr.end(),
+    [child](const std::unique_ptr<Node> &ptr) { return ptr.get() == child; }
+  );
+
+  if (it == arr.end()) return ErrorCode::NullChild;
+
+  (*it)->_parent = nullptr;
+  arr.erase(it, arr.end());
+
+  if (arr.empty()) _children.reset();
+
+  return ErrorCode::Success;
+}
+
+Node &Node::ChildByIndex(size_t index) {
+  assert(_children && "Children array is not initialized");
+  assert(index < _children->size() && "Index out of bounds");
   return *(*_children)[index];
 }
 
-Node &Node::GetChildByName(std::string_view name) {
-  PR_ASSERT_NODE(_children, "This node has no children");
+Node &Node::ChildByName(std::string_view name) {
+  assert(_children && "Children array is not initialized");
 
-  for (const auto &child : *_children) {
+  for (const auto &child : *_children)
     if (child->_name == name) return *child;
-  }
 
-  PR_ASSERT_NODE(false, "Child with given name not found");
-  static Node dummy("unused");
-  return dummy;
-}
-
-void Node::UpdateTree() {
-  Update();
-
-  if (!_children) return;
-
-  for (auto &child : *_children) {
-    PR_ASSERT_NODE(child != nullptr, "Null child found during UpdateTree");
-    child->UpdateTree();
-  }
-}
-
-void Node::FixedUpdateTree() {
-  FixedUpdate();
-
-  if (!_children) return; 
-
-  for (auto &child : *_children) {
-    PR_ASSERT_NODE(child != nullptr, "Null child found during FixedUpdateTree");
-    child->FixedUpdateTree();
-  }
+  assert(false && "Child with given name not found");
+  std::terminate();
 }
