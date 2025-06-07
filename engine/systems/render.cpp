@@ -1,57 +1,21 @@
 #include "render.hpp"
-#include "../utils/vec2.hpp"
 #include <algorithm>
 
-RenderCommand::RenderCommand() noexcept
-  : texture()
-  , sourceRect()
-  , destRect()
-  , rotation(0.0f)
-  , tint(ColorRGBA::White())
-  , zIndex(0) {}
-
-RenderCommand::RenderCommand(
-  Texture2D texture, 
-  Rect sourceRect, 
-  Rect destRect
-) noexcept
-  : texture(texture)
-  , sourceRect(sourceRect)
-  , destRect(destRect)
-  , rotation(0.0f)
-  , tint(ColorRGBA::White())
-  , zIndex(0) {}
-
-RenderCommand::RenderCommand(
-  Texture2D texture, 
-  Rect sourceRect, 
-  Rect destRect, 
-  float rotation, 
-  ColorRGBA tint, 
-  int8_t zIndex
-) noexcept
-  : texture(texture)
-  , sourceRect(sourceRect)
-  , destRect(destRect)
-  , rotation(rotation)
-  , tint(tint)
-  , zIndex(zIndex) {}
-
-void RenderQueue::SortByZIndex() {
+void RenderSystem2D::SortByZIndex() {
   if (_dirty) std::sort(_commandBuffer.begin(), _commandBuffer.end());
   _dirty = false;
 }
 
-RenderQueue::RenderQueue() noexcept {
+RenderSystem2D::RenderSystem2D() noexcept {
   _commandBuffer.reserve(DEFAULT_BUFFER_CAP);
 }
 
-void RenderQueue::AddCommand(const RenderCommand &command) noexcept {
+void RenderSystem2D::AddCommand(const components::RenderCommand2D &command) noexcept {
   _commandBuffer.emplace_back(command);
   _dirty = true;
 }
 
-void RenderQueue::Flush() {
+void RenderSystem2D::Flush() {
   SortByZIndex();
 
   for (const auto &command : _commandBuffer) {

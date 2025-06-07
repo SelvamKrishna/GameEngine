@@ -11,7 +11,7 @@ ENGINE_DIR := engine
 SANDBOX_DIR := sandbox
 BUILD_DIR := build
 
-ENGINE_SRC := $(wildcard $(ENGINE_DIR)/*.cpp) $(wildcard $(ENGINE_DIR)/*/*.cpp) 
+ENGINE_SRC := $(wildcard $(ENGINE_DIR)/*/*.cpp) $(wildcard $(ENGINE_DIR)/*/*/*.cpp) 
 ENGINE_OBJ := $(ENGINE_SRC:$(ENGINE_DIR)/%.cpp=$(BUILD_DIR)/engine/%.o)
 
 SANDBOX_SRC := $(wildcard $(SANDBOX_DIR)/*.cpp)

@@ -9,7 +9,7 @@ private:
   friend class App;
 
   std::unique_ptr<Node> _root;
-  RenderQueue _renderQueue;
+  RenderSystem2D _renderQueue;
   
 private:
   void Update();
@@ -38,7 +38,7 @@ public:
   [[nodiscard]] 
   bool HasRoot() const noexcept { return static_cast<bool>(_root); }
 
-  inline void AddRenderCommand(const RenderCommand &command) noexcept {
+  inline void AddRenderCommand(const components::RenderCommand2D &command) noexcept {
     _renderQueue.AddCommand(command);
   }
 };

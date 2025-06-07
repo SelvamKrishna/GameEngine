@@ -111,11 +111,19 @@ public:
     return std::sqrt(x * x + y * y);
   }
 
-  [[nodiscard]] Vec2 Normalize() const noexcept {
+  [[nodiscard]] Vec2 Normalized() const noexcept {
     float len = Length();
     if (len == 0.f)
       return {0.f, 0.f};
     return {x / len, y / len};
+  }
+
+  void Normalize() noexcept {
+    float len = Length();
+    if (len != 0.f) {
+      x /= len;
+      y /= len;
+    }
   }
 
   constexpr float Dot(const Vec2 &other) const noexcept {
