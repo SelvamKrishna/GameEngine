@@ -29,25 +29,25 @@ release: CXXFLAGS += $(RELEASE_FLAGS)
 release: $(SANDBOX_BIN)
 
 $(ENGINE_LIB): $(ENGINE_OBJ)
-	if not exist "$(dir $@)" mkdir "$(dir $@)"
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	ar rcs $@ $^
 
 $(BUILD_DIR)/engine/%.o: $(ENGINE_DIR)/%.cpp
-	if not exist "$(dir $@)" mkdir "$(dir $@)"
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/sandbox/%.o: $(SANDBOX_DIR)/%.cpp
-	if not exist "$(dir $@)" mkdir "$(dir $@)"
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(SANDBOX_BIN): $(SANDBOX_OBJ) $(ENGINE_LIB)
-	if not exist "$(BUILD_DIR)" mkdir "$(BUILD_DIR)"
+	@if not exist "$(dir $@)" mkdir "$(dir $@)"
 	$(CXX) $^ -o $@ $(LDFLAGS)
 
 run: debug
 	./$(SANDBOX_BIN)
 
 clean:
-	if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
+	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
 
 .PHONY: all debug release run clean

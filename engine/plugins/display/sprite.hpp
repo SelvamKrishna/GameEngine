@@ -35,4 +35,7 @@ public:
       destRect.height / static_cast<float>(texture.height)
     };
   }
+
+  inline void FlipX() noexcept { sourceRect.width *= -1; }
+  inline void FlipY() noexcept { sourceRect.height *= -1; }
 };

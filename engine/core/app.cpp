@@ -20,15 +20,22 @@ void App::Run() {
   TimeSystem &timeSystem = TimeSystem::Instance();
 
   while (_isRunning) {
+    if (WindowShouldClose()) {
+      _isRunning = false;
+      break;
+    }
+
     const float kDeltaTime = GetFrameTime();
     timeSystem._deltaTime = kDeltaTime;
-
-    if (timeSystem.IsPaused()) [[unlikely]] continue;
-
     timeSystem._UpdateInfo();
-    _accumulator += kDeltaTime;
 
-    if (WindowShouldClose()) [[unlikely]] _isRunning = false;
+    if (timeSystem.IsPaused()) {
+      BeginDrawing();
+      EndDrawing();
+      continue;
+    }
+
+    _accumulator += kDeltaTime;
 
     while (_accumulator >= kFixedDeltaTime) {
       _currentScene._FixedProcess();

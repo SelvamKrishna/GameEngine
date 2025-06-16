@@ -19,5 +19,4 @@ void SceneTree::_Process() {
 #endif
   _renderQueue.Flush();
   EndDrawing();
-
 }

@@ -16,7 +16,7 @@ struct components::RenderCommand2D {
   Rect destRect;
   Rotaion2D rotation = 0.0f;
   ColorRGBA tint = ColorRGBA::White();
-  int8_t zIndex = 0;
+  int32_t zIndex = 0;
 
   RenderCommand2D() noexcept;
 

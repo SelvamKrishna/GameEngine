@@ -1,62 +1,19 @@
 #include "../engine/core/app.hpp"
 #include "comp.cpp"
-#include <utility>
 
 int main() {
+  // Currently in the process of making a sample game
+  // Flappy Bird Clone
   App &app = App::Instance();
-  app.Init(800, 800, "Render System Z-Index Test");
+  app.Init(400, 600, "Sandbox Flappy Bird");
 
-  SceneTree sceneTree;
-  Node *rootNode = new Node("Root Node");
+  Node *gameSceneRoot = new Node("GameSceneRoot");
+  gameSceneRoot->AddChild(new Bird("Flappy"));
+  gameSceneRoot->AddChild(new Pipe("Pipe"));
 
-  auto spriteMango = new Sprite2D(
-    "Mango", 
-    components::RenderCommand2DBuilder()
-      .LoadTextureFromFile("assets/mango.jpeg")
-      .DefaultSourceRect()
-      .SetDestRect(components::Postion2D(100, 100))
-      .SetZIndex(0)
-    .Build()
-  );
+  SceneTree gameScene;
+  gameScene.SetRoot(gameSceneRoot);
 
-  auto spriteApple = new Sprite2D(
-    "Apple",
-    components::RenderCommand2DBuilder()
-      .LoadTextureFromFile("assets/apple.jpg")
-      .DefaultSourceRect()
-      .SetDestRect(components::Postion2D(200, 200))
-      .SetZIndex(1)
-    .Build()
-  );
-  
-  auto appleMover = new SpriteMover(
-    "AppleMover", 
-    spriteApple, 
-    500.0f
-  );
-
-  auto spriteBanana = new Sprite2D(
-    "Banana",
-    components::RenderCommand2DBuilder()
-      .LoadTextureFromFile("assets/banana.jpg")
-      .DefaultSourceRect()
-      .SetDestRect(components::Postion2D(300, 300))
-      .SetZIndex(2)
-    .Build()
-  );
-
-  auto bananaZToggle = new SpriteZToggle(
-    "BananaZToggle", 
-    spriteBanana
-  );
-
-  rootNode->AddChild(spriteMango);
-  rootNode->AddChild(spriteApple);
-  rootNode->AddChild(appleMover);
-  rootNode->AddChild(spriteBanana);
-  rootNode->AddChild(bananaZToggle);
-
-  sceneTree.SetRoot(rootNode);
-  app.SetCurrentScene(std::move(sceneTree));
+  app.SetCurrentScene(std::move(gameScene));
   app.Run();
 }

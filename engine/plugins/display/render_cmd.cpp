@@ -4,30 +4,31 @@
 using namespace components;
 
 RenderCommand2D::RenderCommand2D() noexcept
-  : texture()
-  , sourceRect()
-  , destRect()
-  , rotation(0.0f)
-  , tint(ColorRGBA::White())
-  , zIndex(0) {}
-  
+  : texture{}
+  , sourceRect{}
+  , destRect{}
+  , rotation{0.0f}
+  , tint{ColorRGBA::White()}
+  , zIndex{0} {}
+
 RenderCommand2DBuilder &
 RenderCommand2DBuilder::SetTexture(Texture2D &texture) noexcept {
   _command.texture = texture;
-  return *this;
+
+  if (texture.id == 0) {
+    TraceLog(LOG_WARNING, "SetTexture called with invalid texture (id = 0)");
+  }
+
+  return DefaultSourceRect();
 }
 
 RenderCommand2DBuilder &
 RenderCommand2DBuilder::LoadTextureFromFile(std::string texturePath) noexcept {
   _command.texture = LoadTexture(texturePath.c_str());
-  if (_command.texture.id == 0) {
-    TraceLog(
-      LOG_ERROR, 
-      "Failed to load texture from path: %s", texturePath.c_str()
-    );
-  }
-  
-  return *this;
+  if (_command.texture.id == 0) 
+    TraceLog(LOG_ERROR, "Failed to load texture from path: %s", texturePath.c_str());
+
+  return DefaultSourceRect();
 }
 
 RenderCommand2DBuilder &
@@ -39,11 +40,7 @@ RenderCommand2DBuilder::SetSourceRect(Rect sourceRect) noexcept {
 RenderCommand2DBuilder &
 RenderCommand2DBuilder::DefaultSourceRect() noexcept {
   if (_command.texture.id == 0) {
-    TraceLog(
-      LOG_WARNING, 
-      "Texture not set, cannot set default source rect."
-    );
-
+    TraceLog(LOG_WARNING, "Texture not set, cannot set default source rect.");
     return *this;
   }
 
@@ -53,7 +50,7 @@ RenderCommand2DBuilder::DefaultSourceRect() noexcept {
     static_cast<float>(_command.texture.width),
     static_cast<float>(_command.texture.height)
   };
-  
+
   return *this;
 }
 

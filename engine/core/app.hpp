@@ -32,10 +32,6 @@ public:
   void Run();
   inline void Quit() noexcept { _isRunning = false; }
 
-  [[nodiscard]] inline float Accumulator() const noexcept {
-    return _accumulator;
-  }
-
   [[nodiscard]] inline bool IsRunning() const noexcept {
     return _isRunning;
   }

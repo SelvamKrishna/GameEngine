@@ -27,6 +27,7 @@ public:
   void SetRoot(Node *root) noexcept {
     _root.reset(root);
     if (_root) [[likely]] _root->_Init();
+    _root->_state = Node::State::Active;
   }
 
   [[nodiscard]] inline Node *Root() noexcept { return _root.get(); }

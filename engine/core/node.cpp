@@ -67,6 +67,7 @@ Node::ErrorCode Node::AddChild(Node *child) noexcept {
 
   child->_parent = this;
   child->_Init();
+  child->_state = State::Active;
 
   arr.emplace_back(child);
   return ErrorCode::Success;
